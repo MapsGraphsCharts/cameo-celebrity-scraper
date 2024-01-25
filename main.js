@@ -53,8 +53,15 @@ const db = new sqlite3.Database('./cameo.db', (err) => {
     console.log('Connected to the SQLite database.');
 });
 
+// Get today's date and format it as YYYYMMDD
+const date = new Date();
+const dateString = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+
+// Use the date string in the table name
+const tableName = `users_${dateString}`;
+
 db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS users (
+    db.run(`CREATE TABLE IF NOT EXISTS ${tableName} (
         _id TEXT PRIMARY KEY,
         name TEXT,
         username TEXT,
@@ -73,8 +80,7 @@ db.serialize(() => {
         numOfRatings INTEGER,
         isAvailableForBusiness BOOLEAN,
         aaQueryId TEXT,
-        aaIndex TEXT,
-        insertionDate TEXT
+        aaIndex TEXT
     )`);
 });
 
@@ -136,18 +142,16 @@ async function main() {
                 const hits = apiResponse.data.results[0].hits;
 
                 for (const hit of hits) {
-                    const currentDate = new Date().toISOString().split('T')[0];
-
-                    db.run(`INSERT OR REPLACE INTO users (
-                        _id, name, username, imageUrlKey, profession, price, dmPrice, iosPrice, businessPrice,
-                        talentSettings, userPromotions, averageMillisecondsToComplete, tags, temporarilyUnavailable,
-                        averageRating, numOfRatings, isAvailableForBusiness, aaQueryId, aaIndex, insertionDate
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    db.run(`INSERT OR REPLACE INTO ${tableName} (
+                    _id, name, username, imageUrlKey, profession, price, dmPrice, iosPrice, businessPrice,
+                    talentSettings, userPromotions, averageMillisecondsToComplete, tags, temporarilyUnavailable,
+                    averageRating, numOfRatings, isAvailableForBusiness, aaQueryId, aaIndex
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                         [
                             hit._id, hit.name, hit.username, hit.imageUrlKey, hit.profession, hit.price, hit.dmPrice,
                             hit.iosPrice, hit.businessPrice, JSON.stringify(hit.talentSettings), JSON.stringify(hit.userPromotions),
                             hit.averageMillisecondsToComplete, JSON.stringify(hit.tags), hit.temporarilyUnavailable,
-                            hit.averageRating, hit.numOfRatings, hit.isAvailableForBusiness, hit.aaQueryId, hit.aaIndex, currentDate
+                            hit.averageRating, hit.numOfRatings, hit.isAvailableForBusiness, hit.aaQueryId, hit.aaIndex
                         ],
                         function (err) {
                             if (err) {
