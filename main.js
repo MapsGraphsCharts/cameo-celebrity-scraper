@@ -59,6 +59,9 @@ const dateString = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(
 
 // Use the date string in the table name
 const tableName = `users_${dateString}`;
+// Check if the script is running
+console.log('Script is running');
+
 
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -143,10 +146,10 @@ async function main() {
 
                 for (const hit of hits) {
                     db.run(`INSERT OR REPLACE INTO ${tableName} (
-                    _id, name, username, imageUrlKey, profession, price, dmPrice, iosPrice, businessPrice,
-                    talentSettings, userPromotions, averageMillisecondsToComplete, tags, temporarilyUnavailable,
-                    averageRating, numOfRatings, isAvailableForBusiness, aaQueryId, aaIndex
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        _id, name, username, imageUrlKey, profession, price, dmPrice, iosPrice, businessPrice,
+        talentSettings, userPromotions, averageMillisecondsToComplete, tags, temporarilyUnavailable,
+        averageRating, numOfRatings, isAvailableForBusiness, aaQueryId, aaIndex
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                         [
                             hit._id, hit.name, hit.username, hit.imageUrlKey, hit.profession, hit.price, hit.dmPrice,
                             hit.iosPrice, hit.businessPrice, JSON.stringify(hit.talentSettings), JSON.stringify(hit.userPromotions),
@@ -154,6 +157,7 @@ async function main() {
                             hit.averageRating, hit.numOfRatings, hit.isAvailableForBusiness, hit.aaQueryId, hit.aaIndex
                         ],
                         function (err) {
+                            // Check for errors during data insertion
                             if (err) {
                                 console.error(`Error occurred while inserting ${hit._id}:`, err);
                             }
