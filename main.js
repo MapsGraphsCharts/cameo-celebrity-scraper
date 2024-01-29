@@ -116,14 +116,15 @@ async function main() {
                                 "new_category_slugs_paths",
                                 "promo_price"
                             ],
+                            "filters": `new_category_slugs_paths:${category}`,
                             "highlightPostTag": "__/ais-highlight__",
                             "highlightPreTag": "__ais-highlight__",
                             "hitsPerPage": 48,
                             "maxValuesPerFacet": 41,
+                            // "optionalFilters": [`tags_slugs:${category}-profession-boost`],
                             "page": page,
                             "query": "",
-                            "tagFilters": "",
-                            "facetFilters": [`new_category_slugs_paths:${category}`]
+                            "tagFilters": ""
                         }
                     }
                 ]
